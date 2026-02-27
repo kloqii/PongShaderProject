@@ -5,6 +5,7 @@
 typedef struct {
     void* window;
     void* glContext;
+    void* scene; // NEED!!!
     i32 windowWidth;
     i32 windowHeight;
     Matrix4 projection;

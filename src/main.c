@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
         return 1;
 
     Scene* scene = SceneInit();
+    app.scene = scene; // don't know if this belongs here!
     
     Image iconImage = IOLoadImage("assets/textures/canis_engine_icon.tga");
     Image containerImage = IOLoadImage("assets/textures/container.tga");
