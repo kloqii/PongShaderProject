@@ -19,6 +19,7 @@
 #include "cpup/model.h"
 #include "cpup/shader.h"
 #include "cpup/window.h"
+#include "cpup/inputmanager.h"
 
 #include "cpup/scene.h"
 
@@ -30,7 +31,7 @@ AppContext app;
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    
+
     if (InitCanis() > 0)
         return 1;
 
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
         return 1;
 
     Scene* scene = SceneInit();
-    app.scene = scene; // don't know if this belongs here!
+    app.scene = scene;
     
     Image iconImage = IOLoadImage("assets/textures/canis_engine_icon.tga");
     Image containerImage = IOLoadImage("assets/textures/container.tga");
@@ -73,6 +74,7 @@ int main(int argc, char *argv[])
     Model model = BuildModel(&vertices, &indices, STATIC_DRAW);
 
     Entity* ball = Spawn(&scene);
+    ball->name = "ball";
     ball->transform.position = InitVector3(app.windowWidth * 0.5f, app.windowHeight * 0.5f, 0.0f);
     ball->data = calloc(1, sizeof(Ball));
     ball->image = &circleImage;
@@ -84,17 +86,20 @@ int main(int argc, char *argv[])
     ball->OnDestroy = BallOnDestroy;
 
     Entity* leftPaddle = Spawn(&scene);
+    leftPaddle->name = "leftPaddle";
     leftPaddle->transform.position = InitVector3(16.0f, app.windowHeight * 0.5f, 0.0f);
     leftPaddle->data = calloc(1, sizeof(Paddle));
     leftPaddle->image = &squareImage;
     leftPaddle->model = &model;
     leftPaddle->shaderId = shaderProgram;
     leftPaddle->Start = PaddleStart;
+    leftPaddle->color = InitVector4(1.0f, 0.0f, 0.0f, 1.0f);
     leftPaddle->Update = PaddleUpdate;
     leftPaddle->Draw = PaddleDraw;
     leftPaddle->OnDestroy = PaddleOnDestroy;
 
     Entity* rightPaddle = Spawn(&scene);
+    rightPaddle->name = "rightPaddle";
     rightPaddle->transform.position = InitVector3(app.windowWidth - 16.0f, app.windowHeight * 0.5f, 0.0f);
     rightPaddle->data = calloc(1, sizeof(Paddle));
     rightPaddle->image = &squareImage;
@@ -109,25 +114,14 @@ int main(int argc, char *argv[])
     f32 time = 0.0f;
     while(running) {
         // imput
+        InputManagerNewFrame(&app);
+        //printf("FPS: %f Entity Count: %i\n", 1.0f/app.deltaTime, vec_count(&scene->entities));
+
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_EVENT_QUIT)
                 running = false;
-            if (event.type == SDL_EVENT_KEY_UP)
-            {
-                if (event.key.scancode == SDL_SCANCODE_R)
-                {
-                    printf("Load new shader!\n");
-                    u32 newShader = GenerateShaderFromFiles("assets/shaders/logo.vs", "assets/shaders/logo.fs");
-
-                    if (newShader != 0)
-                    {
-                        DeleteShader(shaderProgram);
-                        shaderProgram = newShader;
-                    }
-                }
-            }
         }
 
         // render

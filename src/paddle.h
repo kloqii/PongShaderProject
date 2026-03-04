@@ -14,7 +14,7 @@ void PaddleStart(AppContext* _app, Entity* _entity) {
 }
 
 void PaddleUpdate(AppContext* _app, Entity* _entity) {
-
+    
 }
 
 void PaddleDraw(AppContext* _app, Entity* _entity) {
