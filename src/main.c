@@ -113,6 +113,9 @@ int main(int argc, char *argv[])
     
     bool running = true;
     f32 time = 0.0f;
+
+    app.rightScore = 0;
+    app.leftScore = 0;
     while(running) {
         // imput
         InputManagerNewFrame(&app);
@@ -124,6 +127,11 @@ int main(int argc, char *argv[])
             if (event.type == SDL_EVENT_QUIT)
                 running = false;
         }
+        // update score in window title
+        char title[64];
+        sprintf(title, "Pong | Left: %d   Right: %d", app.leftScore, app.rightScore);
+        SDL_SetWindowTitle(app.window, title);
+
 
         // render
         ClearWindow();
