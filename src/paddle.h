@@ -8,14 +8,48 @@ typedef struct {
 } Paddle;
 
 void PaddleStart(AppContext* _app, Entity* _entity) {
-    _entity->color = InitVector4(1.0f, 1.0f, 1.0f, 1.0f);
     _entity->transform.rotation = 0.0f;
     _entity->transform.scale = InitVector3(32.0f, 128.0f, 1.0f);
 }
 
 void PaddleUpdate(AppContext* _app, Entity* _entity) {
+    float speed = 250.0f;
+    float direction = 0.0f;
+
+    // check for keybinds of leftPaddle
+    if (strcmp(_entity->name, "leftPaddle") == 0)
+    {
+        if (GetKey(_app, SDL_SCANCODE_W))
+            direction += 1.0f;
+        if (GetKey(_app, SDL_SCANCODE_S))
+            direction -= 1.0f;
+    }
+
+    // check for keybinds of rightPaddle
+    else 
+    {
+        if (GetKey(_app, SDL_SCANCODE_UP))
+            direction += 1.0f;
+        if (GetKey(_app, SDL_SCANCODE_DOWN))
+            direction -= 1.0f;
+    }
     
+    // movement
+    _entity->transform.position.y += direction * speed * _app->deltaTime ;
+
+    float paddleHalfHeight = _entity->transform.scale.y * 0.5f;
+    // if paddle hits the top of window, stop
+    if (_entity->transform.position.y + paddleHalfHeight > _app->windowHeight)
+    {
+        _entity->transform.position.y = _app->windowHeight - paddleHalfHeight;
+    }
+    // if paddle hits the bottom of window, stop
+     if (_entity->transform.position.y - paddleHalfHeight < 0)
+    {
+        _entity->transform.position.y = paddleHalfHeight;
+    }
 }
+
 
 void PaddleDraw(AppContext* _app, Entity* _entity) {
     Matrix4 transform = IdentityMatrix4(); // the order is important

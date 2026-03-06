@@ -50,6 +50,48 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
 
     Vector3 delta = Vec2ToVec3(Vec2Mul(_entity->velocity, _app->deltaTime));
     _entity->transform.position = Vec3Add(_entity->transform.position, delta);
+
+    // calculate ball boundaries
+    float ballHalfWidth = _entity->transform.scale.x * 0.5f;
+    float ballHalfHeight = _entity->transform.scale.y * 0.5f;
+
+    float ballLeft = _entity->transform.position.x - ballHalfWidth;
+    float ballRight = _entity->transform.position.x + ballHalfWidth;
+    float ballTop = _entity->transform.position.y + ballHalfHeight;
+    float ballBottom = _entity->transform.position.y - ballHalfHeight;
+
+    Scene * scene = _app->scene;
+    // loop entities to find paddles
+    for (int i = 0; i < vec_count(&scene->entities); i++)
+    {   
+        Entity* other = &scene->entities[i];
+
+        if (other == _entity)
+            continue;
+
+        if (other->name == NULL)
+            continue;
+
+        // when paddles are found, track collision
+        if (strcmp(other->name, "leftPaddle") == 0 || strcmp(other->name, "rightPaddle") == 0)
+        {   
+            // calculate paddle boundaries
+            float paddleHalfWidth  = other->transform.scale.x * 0.5f;
+            float paddleHalfHeight = other->transform.scale.y * 0.5f;
+
+            float paddleLeft   = other->transform.position.x - paddleHalfWidth;
+            float paddleRight  = other->transform.position.x + paddleHalfWidth;
+            float paddleTop    = other->transform.position.y + paddleHalfHeight;
+            float paddleBottom = other->transform.position.y - paddleHalfHeight;
+            
+            // if boundaries make contact, bounce opposite direction
+            if (ballRight > paddleLeft && ballLeft < paddleRight && 
+                ballTop > paddleBottom && ballBottom < paddleTop)
+                {
+                    _entity->velocity.x *= -1.0f; 
+                }
+        }
+    }
 }
 
 void BallDraw(AppContext* _app, Entity* _entity) {

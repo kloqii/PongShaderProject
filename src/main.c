@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
     rightPaddle->model = &model;
     rightPaddle->shaderId = shaderProgram;
     rightPaddle->Start = PaddleStart;
+    rightPaddle->color = InitVector4(0.0f, 0.0f, 1.0f, 1.0f);
     rightPaddle->Update = PaddleUpdate;
     rightPaddle->Draw = PaddleDraw;
     rightPaddle->OnDestroy = PaddleOnDestroy;
