@@ -66,6 +66,7 @@ void PaddleDraw(AppContext* _app, Entity* _entity) {
     ShaderSetVector4(_entity->shaderId, "COLOR", _entity->color);
     ShaderBindTexture(_entity->shaderId, _entity->image->id, "MAIN_TEXTURE", 0);
     ShaderSetMatrix4(_entity->shaderId, "TRANSFORM", transform);
+    ShaderSetFloat(_entity->shaderId, "SCROLL", 0);
     DrawModel(*_entity->model);
 
     UnBindShader();

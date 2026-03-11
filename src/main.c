@@ -25,6 +25,7 @@
 
 #include "ball.h"
 #include "paddle.h"
+#include "grid.h"
 
 AppContext app;
 
@@ -48,6 +49,7 @@ int main(int argc, char *argv[])
     Image containerImage = IOLoadImage("assets/textures/container.tga");
     Image circleImage = IOLoadImage("assets/textures/circle.tga");
     Image squareImage = IOLoadImage("assets/textures/square.tga");
+    Image gridBG = IOLoadImage("assets/textures/grid.tga");
     
     // build and compile our shader program
     u32 shaderProgram = GenerateShaderFromFiles("assets/shaders/logo.vs", "assets/shaders/logo.fs");
@@ -72,6 +74,18 @@ int main(int argc, char *argv[])
     vec_append(&indices, in, 6);
     
     Model model = BuildModel(&vertices, &indices, STATIC_DRAW);
+
+    Entity* grid = Spawn(&scene);
+    grid->name = "grid";
+    grid->transform.position = InitVector3(app.windowWidth * 0.5f, app.windowHeight * 0.5f, -0.1f);
+    grid->transform.scale = InitVector3(app.windowWidth, app.windowHeight, 1.0f);
+    grid->image = &gridBG;
+    grid->model = &model;
+    grid->shaderId = shaderProgram;
+    grid->Start = GridStart;
+    grid->Update = GridUpdate;
+    grid->Draw = GridDraw;
+    grid->OnDestroy = GridOnDestroy;
 
     Entity* ball = Spawn(&scene);
     ball->name = "ball";
@@ -129,7 +143,7 @@ int main(int argc, char *argv[])
         }
         // update score in window title
         char title[64];
-        sprintf(title, "Pong | Left: %d   Right: %d", app.leftScore, app.rightScore);
+        sprintf(title, "Pong | Red: %d   Blue: %d", app.leftScore, app.rightScore);
         SDL_SetWindowTitle(app.window, title);
 
 
@@ -160,6 +174,7 @@ int main(int argc, char *argv[])
     free(containerImage.data);
     free(circleImage.data);
     free(squareImage.data);
+    free(gridBG.data);
 
     SceneFree(&scene);
 

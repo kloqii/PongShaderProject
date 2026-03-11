@@ -43,7 +43,7 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
             (Vector2){-0.72f, -0.72f},
         };
 
-        _entity->velocity = Vec2Mul(directions[startingDirection], 200.0f);
+        _entity->velocity = Vec2Mul(directions[startingDirection], 300.0f);
     }
 
     // check if ball is heading below the screen
@@ -109,12 +109,12 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
                     float overlapHori = fminf(ballRight - paddleLeft, paddleRight - ballLeft);
                     float overlapVert = fminf(ballTop - paddleBottom, paddleTop - ballBottom);
                     
+                    // prevent ball from clipping to paddle
                     if (overlapHori < overlapVert)
                         _entity->velocity.x *= -1.0f; 
                     else
                     {
                         _entity->velocity.y *= -1.0f;
-                        printf("Vertical collision\n");
 
                         if (_entity->transform.position.y < other->transform.position.y)
                         {
@@ -152,6 +152,7 @@ void BallDraw(AppContext* _app, Entity* _entity) {
     ShaderSetVector4(_entity->shaderId, "COLOR", _entity->color);
     ShaderBindTexture(_entity->shaderId, _entity->image->id, "MAIN_TEXTURE", 0);
     ShaderSetMatrix4(_entity->shaderId, "TRANSFORM", transform);
+    ShaderSetFloat(_entity->shaderId, "SCROLL", 0);
     DrawModel(*_entity->model);
 
     UnBindShader();
