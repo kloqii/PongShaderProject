@@ -19,11 +19,6 @@ void BallStart(AppContext* _app, Entity* _entity) {
     _entity->transform.scale = InitVector3(32.0f, 32.0f, 1.0f);
 }
 
-void BallReset(AppContext* _app, Entity* _entity) {
-    _entity -> transform.position = InitVector3(_app->windowHeight * 0.5f, _app->windowWidth * 0.5f, 0.0f);
-    _entity -> velocity = InitVector2(0.0f, 0.0f);
-}
-
 void BallUpdate(AppContext* _app, Entity* _entity) {
 
     if (GetKeyDown(_app, SDL_SCANCODE_P))
@@ -42,7 +37,7 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
             (Vector2){-0.72f, -0.72f},
         };
 
-        _entity->velocity = Vec2Mul(directions[startingDirection], 150.0f);
+        _entity->velocity = Vec2Mul(directions[startingDirection], 200.0f);
     }
 
     // check if ball is heading below the screen
@@ -53,18 +48,6 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
     if (_entity->transform.position.y + _entity->transform.scale.y * 0.5f >= _app->windowHeight && _entity->velocity.y > 0.0f)
         _entity->velocity.y *= -1.0f; 
 
-    // right player scores
-    if (_entity->transform.position.x < 0) {
-        _app->rightScore++;
-        BallReset(_app, _entity);
-    }
-
-    // left player scores
-    if (_entity->transform.position.x > _app->windowWidth) {
-        _app->leftScore++;
-        BallReset(_app, _entity);
-    }
-    
     Vector3 delta = Vec2ToVec3(Vec2Mul(_entity->velocity, _app->deltaTime));
     _entity->transform.position = Vec3Add(_entity->transform.position, delta);
 
@@ -95,7 +78,6 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
             // calculate paddle boundaries
             float paddleHalfWidth  = other->transform.scale.x * 0.5f;
             float paddleHalfHeight = other->transform.scale.y * 0.5f;
-
             float paddleLeft   = other->transform.position.x - paddleHalfWidth;
             float paddleRight  = other->transform.position.x + paddleHalfWidth;
             float paddleTop    = other->transform.position.y + paddleHalfHeight;
@@ -105,11 +87,37 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
             if (ballRight > paddleLeft && ballLeft < paddleRight && 
                 ballTop > paddleBottom && ballBottom < paddleTop)
                 {
-                    _entity->velocity.x *= -1.0f; 
+                    // check for overlap
+                    float overlapHori = fminf(ballRight - paddleLeft, paddleRight - ballLeft);
+                    float overlapVert = fminf(ballTop - paddleBottom, paddleTop - ballBottom);
+                    
+                    if (overlapHori < overlapVert)
+                        _entity->velocity.x *= -1.0f; 
+                    else
+                    {
+                        _entity->velocity.x *= -1.0f;
+                        printf("Vertical collision\n");
+
+                        if (_entity->transform.position.y < other->transform.position.y)
+                        {
+                            _entity->transform.position.y = ballTop == paddleBottom;
+                        }
+                        else
+                        {
+                            _entity->transform.position.y = ballBottom == paddleTop;
+                        }
+                    }
+                    
+                    // change ball color
+                    if (strcmp(other->name, "leftPaddle") == 0)
+                            _entity->color = InitVector4(1.0f, 0.0f, 0.0f, 1.0f);
+
+                    if (strcmp(other->name, "rightPaddle") == 0)
+                            _entity->color = InitVector4(0.0f, 0.0f, 1.0f, 1.0f);
                 }
+            }
         }
     }
-}
 
 void BallDraw(AppContext* _app, Entity* _entity) {
     Matrix4 transform = IdentityMatrix4(); // the order is important
