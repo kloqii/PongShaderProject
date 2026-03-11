@@ -19,6 +19,12 @@ void BallStart(AppContext* _app, Entity* _entity) {
     _entity->transform.scale = InitVector3(32.0f, 32.0f, 1.0f);
 }
 
+void BallReset(AppContext* _app, Entity* _entity) {
+    _entity -> transform.position = InitVector3(_app->windowHeight * 0.5f, _app->windowWidth * 0.5f, 0.0f);
+    _entity -> velocity = InitVector2(0.0f, 0.0f);
+    _entity -> color = InitVector4(1.0f, 1.0f, 1.0f, 1.0f);
+}
+
 void BallUpdate(AppContext* _app, Entity* _entity) {
 
     if (GetKeyDown(_app, SDL_SCANCODE_P))
@@ -47,6 +53,18 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
     // check if ball is heading above the screen
     if (_entity->transform.position.y + _entity->transform.scale.y * 0.5f >= _app->windowHeight && _entity->velocity.y > 0.0f)
         _entity->velocity.y *= -1.0f; 
+
+        // right player scores
+    if (_entity->transform.position.x < 0) {
+        _app->rightScore++;
+        BallReset(_app, _entity);
+    }
+
+    // left player scores
+    if (_entity->transform.position.x > _app->windowWidth) {
+        _app->leftScore++;
+        BallReset(_app, _entity);
+    }
 
     Vector3 delta = Vec2ToVec3(Vec2Mul(_entity->velocity, _app->deltaTime));
     _entity->transform.position = Vec3Add(_entity->transform.position, delta);
@@ -95,16 +113,16 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
                         _entity->velocity.x *= -1.0f; 
                     else
                     {
-                        _entity->velocity.x *= -1.0f;
+                        _entity->velocity.y *= -1.0f;
                         printf("Vertical collision\n");
 
                         if (_entity->transform.position.y < other->transform.position.y)
                         {
-                            _entity->transform.position.y = ballTop == paddleBottom;
+                            _entity->transform.position.y = paddleBottom - ballHalfHeight;
                         }
                         else
                         {
-                            _entity->transform.position.y = ballBottom == paddleTop;
+                            _entity->transform.position.y = paddleTop + ballHalfHeight;
                         }
                     }
                     
