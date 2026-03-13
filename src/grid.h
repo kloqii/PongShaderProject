@@ -14,11 +14,6 @@ void GridStart(AppContext* _app, Entity* _entity) {
     _entity->transform.scale = InitVector3(_app->windowWidth, _app->windowHeight, 1.0f);
 }
 
-void GridUpdate(AppContext* _app, Entity* _entity) {
-    // make grid background scroll to top right
-
-}
-
 void GridDraw(AppContext* _app, Entity* _entity) {
     Matrix4 transform = IdentityMatrix4();
     Mat4Translate(&transform, _entity->transform.position);
@@ -38,8 +33,4 @@ void GridDraw(AppContext* _app, Entity* _entity) {
     DrawModel(*_entity->model);
 
     UnBindShader();
-}
-
-void GridOnDestroy(AppContext* _app, Entity* _entity) {
-
 }

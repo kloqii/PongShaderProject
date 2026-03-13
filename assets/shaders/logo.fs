@@ -9,6 +9,6 @@ uniform float SCROLL;
 
 void main()
 {
-   vec2 offset = vec2(TIME * -0.1, TIME * -0.1) * SCROLL;
+   vec2 offset = vec2(TIME * -0.05, TIME * -0.05) * SCROLL;
    FragColor = texture(MAIN_TEXTURE, TexCoord + offset) * COLOR;// * vec4(ourColor, 1.0);
 }

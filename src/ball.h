@@ -43,7 +43,7 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
             (Vector2){-0.72f, -0.72f},
         };
 
-        _entity->velocity = Vec2Mul(directions[startingDirection], 300.0f);
+        _entity->velocity = Vec2Mul(directions[startingDirection], 275.0f);
     }
 
     // check if ball is heading below the screen
@@ -55,13 +55,13 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
         _entity->velocity.y *= -1.0f; 
 
         // right player scores
-    if (_entity->transform.position.x < 0) {
+    if (_entity->transform.position.x < 0 - 75) {
         _app->rightScore++;
         BallReset(_app, _entity);
     }
 
     // left player scores
-    if (_entity->transform.position.x > _app->windowWidth) {
+    if (_entity->transform.position.x > _app->windowWidth + 75) {
         _app->leftScore++;
         BallReset(_app, _entity);
     }
@@ -128,10 +128,10 @@ void BallUpdate(AppContext* _app, Entity* _entity) {
                     
                     // change ball color
                     if (strcmp(other->name, "leftPaddle") == 0)
-                            _entity->color = InitVector4(1.0f, 0.0f, 0.0f, 1.0f);
+                            _entity->color = InitVector4(1.0f, 0.3f, 0.3f, 1.0f);
 
                     if (strcmp(other->name, "rightPaddle") == 0)
-                            _entity->color = InitVector4(0.0f, 0.0f, 1.0f, 1.0f);
+                            _entity->color = InitVector4(0.3f, 0.3f, 1.0f, 1.0f);
                 }
             }
         }
@@ -153,6 +153,39 @@ void BallDraw(AppContext* _app, Entity* _entity) {
     ShaderBindTexture(_entity->shaderId, _entity->image->id, "MAIN_TEXTURE", 0);
     ShaderSetMatrix4(_entity->shaderId, "TRANSFORM", transform);
     ShaderSetFloat(_entity->shaderId, "SCROLL", 0);
+
+    // create trail matrix and shaders
+
+    // trail offset and positions
+    float trailDistance = 0.15f;
+    Vector3 offset = Vec2ToVec3(Vec2Mul(_entity->velocity, trailDistance));
+    Vector3 trailPosition = Vec3Sub(_entity->transform.position, offset);
+    trailPosition.z -= 0.01f;
+
+    // trail transform
+    float angle = atan2f(_entity->velocity.y, _entity->velocity.x);
+    Matrix4 trailTransform = IdentityMatrix4();
+    Mat4Translate(&trailTransform, trailPosition);
+    Mat4Rotate(&trailTransform, angle, InitVector3(0.0f, 0.0f, 1.0f));
+    
+    // stretch trail
+    Vector3 trailScale = InitVector3(_entity->transform.scale.x * 3.0f, _entity->transform.scale.y, _entity->transform.scale.z);
+    Mat4Scale(&trailTransform, trailScale);
+    Vector4 trailColor = InitVector4(1.0f, 1.0f, 1.0f, 0.1f);
+
+    // draw trail
+    if (!Vec2EqualsZero(_entity->velocity))
+    {
+        ShaderSetVector4(_entity->shaderId, "COLOR", trailColor);
+        ShaderSetMatrix4(_entity->shaderId, "TRANSFORM", trailTransform);
+
+        DrawModel(*_entity->model);
+    }
+
+    // draw ball
+    ShaderSetVector4(_entity->shaderId, "COLOR", _entity->color);
+    ShaderSetMatrix4(_entity->shaderId, "TRANSFORM", transform);
+
     DrawModel(*_entity->model);
 
     UnBindShader();

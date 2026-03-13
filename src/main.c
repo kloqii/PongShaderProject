@@ -83,9 +83,7 @@ int main(int argc, char *argv[])
     grid->model = &model;
     grid->shaderId = shaderProgram;
     grid->Start = GridStart;
-    grid->Update = GridUpdate;
     grid->Draw = GridDraw;
-    grid->OnDestroy = GridOnDestroy;
 
     Entity* ball = Spawn(&scene);
     ball->name = "ball";
@@ -107,7 +105,7 @@ int main(int argc, char *argv[])
     leftPaddle->model = &model;
     leftPaddle->shaderId = shaderProgram;
     leftPaddle->Start = PaddleStart;
-    leftPaddle->color = InitVector4(1.0f, 0.0f, 0.0f, 1.0f);
+    leftPaddle->color = InitVector4(1.0f, 0.3f, 0.3f, 1.0f);
     leftPaddle->Update = PaddleUpdate;
     leftPaddle->Draw = PaddleDraw;
     leftPaddle->OnDestroy = PaddleOnDestroy;
@@ -120,7 +118,7 @@ int main(int argc, char *argv[])
     rightPaddle->model = &model;
     rightPaddle->shaderId = shaderProgram;
     rightPaddle->Start = PaddleStart;
-    rightPaddle->color = InitVector4(0.0f, 0.0f, 1.0f, 1.0f);
+    rightPaddle->color = InitVector4(0.3f, 0.3f, 1.0f, 1.0f);
     rightPaddle->Update = PaddleUpdate;
     rightPaddle->Draw = PaddleDraw;
     rightPaddle->OnDestroy = PaddleOnDestroy;
